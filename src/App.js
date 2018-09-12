@@ -3,16 +3,34 @@ import Projects from './Components/Projects';
 import AddProject from './Components/AddProject';
 import './App.css';
 import uuid from 'uuid';
+import $ from 'jquery';
 
 class App extends Component {
   constructor(){
     super();
     this.state = {
-      projects: []
+      projects: [],
+      todos: []
     }
   }
-// A lifecycle method that fires off everytime the component is re-rendered
-  componentDidMount(){
+
+  getTodos(){
+    $.ajax({
+      url: 'https://jsonplaceholder.typicode.com/todos',
+      dataType: 'json',
+      cache: false,
+      success: function(data){
+        this.setState({todos: data}, function(){
+          console.log(this.state);
+        });
+      }.bind(this),
+      error: function(xhr, status, err){
+        console.log(err);
+      }
+    })
+  }
+
+  getProjects(){
     this.setState({projects: [
       {
         id: uuid.v4(),
@@ -30,6 +48,16 @@ class App extends Component {
         category: "Mobile Development"
       }
     ]});
+  }
+  
+// A lifecycle method that fires off everytime the component is re-rendered
+  componentWillMount(){
+    this.getProjects();
+    this.getTodos();
+  }
+
+  componentDidMount(){
+    this.getTodos();
   }
 
   handleAddProject(project){
